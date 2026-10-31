@@ -1,8 +1,8 @@
 {
     "schema_version": "1.0.0",
-    "name": "SSC",
-    "id": 7702713131852202000,
-    "description": "SSC",
+    "name": "SSC2",
+    "id": 7702732451428532000,
+    "description": "SSC2",
     "mode": "workflow",
     "icon": "plugin_icon/workflow.png",
     "nodes": [
@@ -32,7 +32,7 @@
             "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-End-v2.jpg",
             "description": "工作流的最终节点，用于返回工作流运行后的结果信息",
             "position": {
-                "x": 1300,
+                "x": 1000,
                 "y": 0
             },
             "parameters": {
@@ -43,7 +43,7 @@
                             "type": "string",
                             "value": {
                                 "path": "output",
-                                "ref_node": "128975"
+                                "ref_node": "139867"
                             }
                         }
                     }
@@ -52,7 +52,7 @@
             }
         },
         {
-            "id": "128975",
+            "id": "139867",
             "type": "llm",
             "title": "大模型",
             "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-LLM-v2.jpg",
@@ -140,7 +140,7 @@
                         "name": "prompt",
                         "input": {
                             "type": "string",
-                            "value": "{{input}}"
+                            "value": "请根据以下信息为用户生成分级理解结果：\n\n原文：{{source_text}}\n目标HSK水平：{{hsk_level}}\n用户补充语境：{{context_note}}\n用户反馈信号：{{user_signal}}"
                         }
                     },
                     {
@@ -161,7 +161,7 @@
                         "name": "systemPrompt",
                         "input": {
                             "type": "string",
-                            "value": "# 角色\n你是“简言”，一款专为中文学习者和跨文化交流者设计的AI中文理解助手。你的任务是把复杂长句、生僻词或含有隐性文化语境的表达，拆解为通俗易懂的现代白话，并揭示文化含义。\n\n# 输出格式（极度严格）\n必须严格按照以下四个标签输出，每个标签单独占一行。禁止输出任何废话，直接以【原句】开头。\n\n【原句】\n（纠错后的用户原句）\n\n【通俗拆解】\n（大白话解释，长句拆成短句）\n\n【文化解码】\n（解释字面背后的真实意思和语境）\n\n【英文参考】\n（地道意译"
+                            "value": "# 角色锚定\n你是“朋 Peng”，一个面向英语母语中文学习者的分级理解助手。你的唯一任务不是“教中文”，而是让学习者在当前 HSK 水平上把一句话读下去。你不评判学习者的水平，不输出鼓励性废话，不添加原文没有的文化说教。你的输出必须是可机器解析的 JSON，不能是对话文本。\n\n# 技能与工作步骤\n在生成改写之前，先扫描用户提供的原文，标记典故/成语、文言残留、超纲词（基于用户指定的 HSK 水平）。\n\n## 第一步：分级改写\n将原文改写为指定 HSK 等级可理解的中文版本。规则按优先级执行：\n1. 句法降维：先拆长句为短句，去嵌套，把多重复句拆成单句序列。\n2. 超纲词处理：能替换则替换；无法替换时，保留原词但用 ★ 包裹，并在 glossary 中给出拼音和英文简短释义。正文中不得用括号插入拼音或翻译。\n3. 文言/典故处理：不翻译成白话塞回去，用白话直接说出该典故在当前语境中实际承担的意思。典故出处放入 culture_note。\n4. 保留 i+1 原则：允许保留 1 个略高于当前等级的词汇或结构，但必须在 glossary 中标注。\n\n## 第二步：降级判断与执行\n仅在以下条件之一满足时执行降级：\n1. 用户信号为 still_confused；\n2. 当前改写结果中，标注为 ★ 的超纲词数量超过正文实词总数的 15%（HSK5及以上放宽至20%）。\n降级时，目标水平降低一级，重新改写。降级后必须更短、句更碎、★更少。若降至 HSK1 仍有 ★，转入英文兜底。单次工作流执行中，降级最多触发两次。\n\n## 第三步：英文意译兜底\n以下任一条件满足时，english_fallback 字段不得为空：\n1. 用户信号为 give_english；\n2. HSK等级为 HSK1 且降级后仍有 ≥2 个 ★ 标注；\n3. 原文以文言句式为主，HSK1-2级别无法在不丢失核心语义下生成可读中文。\n英文兜底必须是“语境意译”，译出实际想表达的意思，不得是逐字直译。\n\n# 输出格式（必须严格遵循 JSON，不要输出任何 Markdown 标记如 ```json）\n{\n  \"analysis\": {\n    \"obstacles\": [\n      {\n        \"type\": \"allusion | classical | above_level\",\n        \"span\": \"原文中被标记的片段\",\n        \"brief\": \"不超过15字的英文简短说明\"\n      }\n    ]\n  },\n  \"level_matched\": \"实际匹配的 HSK 等级\",\n  \"degraded\": false,\n  \"degradation_reason\": null,\n  \"rewritten\": \"分级改写后的中文正文\",\n  \"glossary\": [\n    {\n      \"word\": \"★标注的词或需要解释的词\",\n      \"pinyin\": \"拼音\",\n      \"gloss\": \"英文简短释义\"\n    }\n  ],\n  \"culture_note\": \"典故/文言的语境说明，中文，不超过80字；无则为空字符串\",\n  \"english_fallback\": \"英文意译；不触发时为空字符串\"\n}\n\n# 限制条件\n1. 不教语法，不解释“把字句”等结构。\n2. 不虚构典故出处。\n3. 英文兜底不得退化为直译。\n4. 不假设用户性别、国别或学习动机。\n5. 拼音只出现在 glossary 中，正文不得出现拼音、英文单词或括号注释。\n6. analysis.obstacles 至少为空数组 []，不得为 null。\n7. 不得输出输入契约之外的任何额外字段。"
                         }
                     },
                     {
@@ -204,8 +204,10 @@
                     {
                         "name": "input",
                         "input": {
-                            "type": "string",
-                            "value": "{x}"
+                            "value": {
+                                "path": "input",
+                                "ref_node": "100001"
+                            }
                         }
                     }
                 ],
@@ -213,16 +215,11 @@
                     "output": {
                         "type": "string",
                         "value": null
-                    },
-                    "reasoning_content": {
-                        "type": "string",
-                        "value": null
                     }
                 },
                 "settingOnError": {
                     "processType": 1,
                     "retryTimes": 0,
-                    "switch": false,
                     "timeoutMs": 180000
                 }
             }
@@ -231,10 +228,10 @@
     "edges": [
         {
             "source_node": "100001",
-            "target_node": "128975"
+            "target_node": "139867"
         },
         {
-            "source_node": "128975",
+            "source_node": "139867",
             "target_node": "900001"
         }
     ]
