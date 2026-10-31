@@ -1,0 +1,241 @@
+{
+    "schema_version": "1.0.0",
+    "name": "SSC",
+    "id": 7702713131852202000,
+    "description": "SSC",
+    "mode": "workflow",
+    "icon": "plugin_icon/workflow.png",
+    "nodes": [
+        {
+            "id": "100001",
+            "type": "start",
+            "title": "开始",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-Start-v2.jpg",
+            "description": "工作流的起始节点，用于设定启动工作流需要的信息",
+            "position": {
+                "x": 0,
+                "y": 0
+            },
+            "parameters": {
+                "node_outputs": {
+                    "input": {
+                        "type": "string",
+                        "value": null
+                    }
+                }
+            }
+        },
+        {
+            "id": "900001",
+            "type": "end",
+            "title": "结束",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-End-v2.jpg",
+            "description": "工作流的最终节点，用于返回工作流运行后的结果信息",
+            "position": {
+                "x": 1300,
+                "y": 0
+            },
+            "parameters": {
+                "node_inputs": [
+                    {
+                        "name": "output",
+                        "input": {
+                            "type": "string",
+                            "value": {
+                                "path": "output",
+                                "ref_node": "128975"
+                            }
+                        }
+                    }
+                ],
+                "terminatePlan": "returnVariables"
+            }
+        },
+        {
+            "id": "128975",
+            "type": "llm",
+            "title": "大模型",
+            "icon": "https://lf3-static.bytednsdoc.com/obj/eden-cn/dvsmryvd_avi_dvsm/ljhwZthlaukjlkulzlp/icon/icon-LLM-v2.jpg",
+            "description": "调用大语言模型,使用变量和提示词生成回复",
+            "version": "3",
+            "position": {
+                "x": 480,
+                "y": 0
+            },
+            "parameters": {
+                "fcParamVar": {
+                    "knowledgeFCParam": {}
+                },
+                "llmParam": [
+                    {
+                        "name": "modelType",
+                        "input": {
+                            "type": "integer",
+                            "value": "1772700462"
+                        }
+                    },
+                    {
+                        "name": "modelName",
+                        "input": {
+                            "type": "string",
+                            "value": "豆包·2.0·pro"
+                        }
+                    },
+                    {
+                        "name": "generationDiversity",
+                        "input": {
+                            "type": "string",
+                            "value": "balance"
+                        }
+                    },
+                    {
+                        "name": "frequencyPenalty",
+                        "input": {
+                            "type": "float",
+                            "value": "0"
+                        }
+                    },
+                    {
+                        "name": "maxTokens",
+                        "input": {
+                            "type": "integer",
+                            "value": "4096"
+                        }
+                    },
+                    {
+                        "name": "spCurrentTime",
+                        "input": {
+                            "type": "boolean",
+                            "value": false
+                        }
+                    },
+                    {
+                        "name": "spAntiLeak",
+                        "input": {
+                            "type": "boolean",
+                            "value": false
+                        }
+                    },
+                    {
+                        "name": "responseFormat",
+                        "input": {
+                            "type": "integer",
+                            "value": "2"
+                        }
+                    },
+                    {
+                        "name": "parameters",
+                        "input": {
+                            "type": "object",
+                            "properties": {
+                                "max_completion_tokens": {
+                                    "type": "integer",
+                                    "value": "0"
+                                }
+                            },
+                            "value": null
+                        }
+                    },
+                    {
+                        "name": "prompt",
+                        "input": {
+                            "type": "string",
+                            "value": "{{input}}"
+                        }
+                    },
+                    {
+                        "name": "enableChatHistory",
+                        "input": {
+                            "type": "boolean",
+                            "value": false
+                        }
+                    },
+                    {
+                        "name": "chatHistoryRound",
+                        "input": {
+                            "type": "integer",
+                            "value": "3"
+                        }
+                    },
+                    {
+                        "name": "systemPrompt",
+                        "input": {
+                            "type": "string",
+                            "value": "# 角色\n你是“简言”，一款专为中文学习者和跨文化交流者设计的AI中文理解助手。你的任务是把复杂长句、生僻词或含有隐性文化语境的表达，拆解为通俗易懂的现代白话，并揭示文化含义。\n\n# 输出格式（极度严格）\n必须严格按照以下四个标签输出，每个标签单独占一行。禁止输出任何废话，直接以【原句】开头。\n\n【原句】\n（纠错后的用户原句）\n\n【通俗拆解】\n（大白话解释，长句拆成短句）\n\n【文化解码】\n（解释字面背后的真实意思和语境）\n\n【英文参考】\n（地道意译"
+                        }
+                    },
+                    {
+                        "name": "stableSystemPrompt",
+                        "input": {
+                            "type": "string",
+                            "value": ""
+                        }
+                    },
+                    {
+                        "name": "canContinue",
+                        "input": {
+                            "type": "boolean",
+                            "value": false
+                        }
+                    },
+                    {
+                        "name": "loopPromptVersion",
+                        "input": {
+                            "type": "string",
+                            "value": ""
+                        }
+                    },
+                    {
+                        "name": "loopPromptName",
+                        "input": {
+                            "type": "string",
+                            "value": ""
+                        }
+                    },
+                    {
+                        "name": "loopPromptId",
+                        "input": {
+                            "type": "string",
+                            "value": ""
+                        }
+                    }
+                ],
+                "node_inputs": [
+                    {
+                        "name": "input",
+                        "input": {
+                            "type": "string",
+                            "value": "{x}"
+                        }
+                    }
+                ],
+                "node_outputs": {
+                    "output": {
+                        "type": "string",
+                        "value": null
+                    },
+                    "reasoning_content": {
+                        "type": "string",
+                        "value": null
+                    }
+                },
+                "settingOnError": {
+                    "processType": 1,
+                    "retryTimes": 0,
+                    "switch": false,
+                    "timeoutMs": 180000
+                }
+            }
+        }
+    ],
+    "edges": [
+        {
+            "source_node": "100001",
+            "target_node": "128975"
+        },
+        {
+            "source_node": "128975",
+            "target_node": "900001"
+        }
+    ]
+}
